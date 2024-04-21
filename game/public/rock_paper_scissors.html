@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sten Sax Påse</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #2980b9;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 20px;
+            font-size: 1.2em;
+        }
+
+        nav a:hover {
+            background-color: #1abc9c;
+        }
+
+        main {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #game-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .choice-button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .choice-button:hover {
+            background-color: #95a5a6;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: #2c3e50;
+        }
+
+        #score {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sten Sax Påse Spelet</h1>
+    </header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="color_memory_game.html">Färgminne-spelet</a>
+        <a href="#">Sten Sax Påse</a>
+        <a href="guess_the_number_game.html">Gissa Numret</a>
+    </nav>
+    <main>
+        <div id="game-container">
+            <div id="score">Datorn: 0 | Du: 0</div>
+            <button class="choice-button" id="rock">Sten</button>
+            <button class="choice-button" id="paper">Papper</button>
+            <button class="choice-button" id="scissors">Sax</button>
+            <div id="result"></div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {// När HTML-dokumentet laddas, kör denna funktion
+            const choices = ['sten', 'papper', 'sax']; //Array med valmöjligheter
+            const buttons = document.querySelectorAll('.choice-button'); // Hämta alla knappar med klassen "choice-button"
+            const resultDisplay = document.getElementById('result');// Referens till elementet som visar resultatet
+            const scoreDisplay = document.getElementById('score');// Refererar till elementet som visar poängen
+            let computerScore = 0; //resetar score / gör så att det börjar på 0
+            let userScore = 0; //resetar score / gör så att det börjar på 0
+
+            buttons.forEach(button => {         // Lägger till en event listener för varje knapp
+                button.addEventListener('click', function() {           // Spelarens val baserat på knappens ID
+                    const playerChoice = this.id;        // Spelarens val baserat på knappens ID        
+                    const computerChoice = choices[Math.floor(Math.random() * 3)];      // Datorns val slumpas från arrayen "choices"
+                    const result = determineWinner(playerChoice, computerChoice);// Avgör vem som vann 
+                    resultDisplay.textContent = result;         //visar vem som vann/resultatet
+                    scoreDisplay.textContent = `Datorn: ${computerScore} | Du: ${userScore}`;        // Uppdatera och visa poängen för datorn och användaren
+                });
+            });
+
+            function determineWinner(playerChoice, computerChoice) {       // Funktion för att avgöra vinnaren baserat på spelarens och datorns val
+                if (playerChoice === computerChoice) {
+                    return "Det är oavgjort!";   // Om spelarens val är samma som datorns val, är det oavgjort
+                } else if ((playerChoice === 'sten' && computerChoice === 'sax') ||        
+                           (playerChoice === 'papper' && computerChoice === 'sten') ||
+                           (playerChoice === 'sax' && computerChoice === 'papper')) {
+                    userScore++; // Om spelaren vinner, öka användarens poäng och visa "Du vann!"
+                    return "Du vann!";
+                } else {
+                    computerScore++;// Om datorn vinner, öka datorns poäng och visa "Datorn vann!"
+                    return "Datorn vann!";
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Färgminne Spelet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #2980b9;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 20px;
+            font-size: 1.2em;
+        }
+
+        nav a:hover {
+            background-color: #1abc9c;
+        }
+
+        main {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #game-container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #start-button {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #start-button:hover {
+            background-color: #e67e22;
+        }
+
+        #score {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        #sequence-display {
+            font-size: 2em;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #34495e;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #message {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        #color-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .color-button {
+            width: 100px;
+            height: 100px;
+            margin: 5px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .flash {
+            animation: flash 0.3s;
+        }
+
+        @keyframes flash {
+            0% {
+                background-color: #fff;
+            }
+            50% {
+                background-color: transparent;
+            }
+            100% {
+                background-color: #fff;
+            }
+        }
+
+        .red {
+            background-color: #e74c3c;
+        }
+
+        .yellow {
+            background-color: #f1c40f;
+        }
+
+        .blue {
+            background-color: #3498db;
+        }
+
+        .green {
+            background-color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Färgminne Spelet</h1>
+    </header>
+    <nav>
+        <a href="index.html">Hem</a>
+        <a href="#">Färgminne Spelet</a>
+        <a href="rock_paper_scissors.html">Sten Sax Påse</a>
+        <a href="guess_the_number_game.html">Gissa Numret</a>
+    </nav>
+    <main>
+        <div id="game-container">
+            <button id="start-button">Starta spelet</button>
+            <div id="score">Poäng: 0</div>
+            <div id="sequence-display"></div>
+            <div id="message"></div>
+            <div id="color-buttons">
+                <div class="color-button red" data-color="red"></div>
+                <div class="color-button yellow" data-color="yellow"></div>
+                <div class="color-button blue" data-color="blue"></div>
+                <div class="color-button green" data-color="green"></div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+
+            // Hämta element från DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.getElementById('start-button');
+            const sequenceDisplay = document.getElementById('sequence-display');
+            const messageDisplay = document.getElementById('message');
+            const scoreDisplay = document.getElementById('score');
+            const colorButtons = document.querySelectorAll('.color-button');
+            const sound = new Audio('sound.mp3');
+
+    // Variabler för spelet
+            let sequence = [];
+            let userSequence = [];
+            let score = 0;
+            let currentIndex = 0;
+            let gameStarted = false;
+            let waitingForInput = false;
+
+ // start knapp för event listener, det är en funktion som väntar på en specifik händelse (event) att inträffa på ett HTML-element t.ex musklick. När musklicket görs så körs funktionen som är kopplad till event listener. 
+            startButton.addEventListener('click', startGame);
+
+    // Funktion för att starta spelet
+            function startGame() {
+                gameStarted = true;
+                sequence = [];
+                userSequence = [];
+                score = 0;
+                scoreDisplay.textContent = `Score: ${score}`;
+                messageDisplay.textContent = '';
+                currentIndex = 0;
+                generateSequence();
+                showSequence();
+            }
+
+                // Funktion för att generera en ny sekvens
+            function generateSequence() {
+                const colors = ['red', 'yellow', 'blue', 'green'];                                // Färger att välja från
+                const newColor = colors[Math.floor(Math.random() * colors.length)];              // Slumpa en ny färg och lägg till den i sekvensen, multiplicera ett slumptal mellan 0 och längden av arrayen "colors". Genom att köra ett random matte tal så väljs antigen 0,1,2,3 från arayen
+                sequence.push(newColor);
+            }
+
+            function showSequence() {           // Funktion för att visa sekvensen
+                waitingForInput = false;        // Väntar inte på användarinput
+                if (currentIndex < sequence.length) {                   // Hämta färgen för nuvarande index och visa den
+                    const color = sequence[currentIndex];
+                    sequenceDisplay.textContent = color;
+                    flashColor(color);
+                    playSound();
+                    currentIndex++;
+                    setTimeout(showSequence, 1000);
+                } else {
+                    waitingForInput = true;                  // Väntar på användarinput
+                    sequenceDisplay.textContent = '';
+                    currentIndex = 0;
+                }
+            }
+
+            function playSound() {          // Funktion för att spela ljud
+                sound.currentTime = 0;
+                sound.play();
+            }
+
+            function flashColor(color) {            // Funktion för att blinka färg på knappen
+                const button = document.querySelector(`.color-button[data-color="${color}"]`);
+                button.classList.add('flash');
+                setTimeout(() => {
+                    button.classList.remove('flash');
+                }, 300);
+            }
+
+            colorButtons.forEach(button => {            // Eventlistener för färgknappar
+                button.addEventListener('click', function() {
+                    if (gameStarted && waitingForInput) {                   // Om spelet är igång och väntar på användarinput
+                        const color = this.dataset.color;
+                        userSequence.push(color);
+                        flashColor(color); // Flashar button när den klickas
+                        if (userSequence[currentIndex - 1] !== sequence[currentIndex - 1]) {
+                            messageDisplay.textContent = 'Fel sekvens! Game over!';                    // Om användarsekvensen är felaktig, avsluta spelet
+                            userSequence = [];
+                            gameStarted = false;
+                            return;
+                        }
+                        currentIndex++;
+                        if (currentIndex === sequence.length) { 
+                            score++;                        // Om användarsekvensen är korrekt, öka poängen och visa meddelande
+                            scoreDisplay.textContent = `Score: ${score}`;
+                            messageDisplay.textContent = 'Korrekt! Lägger till ny färg...';
+                            userSequence = [];
+                            generateSequence();
+                            setTimeout(showSequence, 1000);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gissa Numret</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2c3e50;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        nav {
+            background-color: #2980b9;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 20px;
+            font-size: 1.2em;
+        }
+
+        nav a:hover {
+            background-color: #1abc9c;
+        }
+
+        main {
+            text-align: center;
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #guess-input {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+        }
+
+        #submit-guess {
+            background-color: #f39c12;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-guess:hover {
+            background-color: #e67e22;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        #leaderboard {
+            margin-top: 275px;
+            font-size: 1.2em;
+            color: #fff;
+            text-align: left;
+            border: 2px solid #f39c12;
+            border-radius: 10px;
+            padding: 10px;
+            width: 300px;
+            height: 300px;
+            overflow-y: auto;
+            position: fixed;
+            top: 100px;
+            right: 20px;
+        }
+
+        #leaderboard h2 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        #leaderboard-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #leaderboard-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gissa Numret</h1>
+    </header>
+    <nav>
+        <a href="index.html">Hem</a>
+        <a href="color_memory_game.html">Färgminne Spelet</a>
+        <a href="rock_paper_scissors.html">Sten Sax Påse</a>
+        <a href="#">Gissa Numret</a>
+    </nav>
+    <main>
+        <div id="game-container">
+            <input type="number" id="guess-input" placeholder="Skriv numret här">
+            <button id="submit-guess">Gissa</button>
+            <div id="result"></div>
+        </div>
+        <div id="leaderboard">
+            <h2>Leaderboard</h2>
+            <ul id="leaderboard-list"></ul>
+        </div>
+    </main>
+
+    <script>
+            // Hämta referenser, HTML-element
+        document.addEventListener('DOMContentLoaded', function() {
+            const guessInput = document.getElementById('guess-input');
+            const submitGuessButton = document.getElementById('submit-guess');
+            const resultDisplay = document.getElementById('result');
+            const leaderboardList = document.getElementById('leaderboard-list');
+
+            let leaderboardData = [];       // Array för att lagra ledartavledata
+
+            // Funktion för att uppdatera leaderboarden 
+            function updateLeaderboardUI() {
+                leaderboardList.innerHTML = '';         // Rensa ledartavlan
+                leaderboardData.forEach(entry => {      //För varje runda, skapa ett listelement i leaderboarden
+                    const listItem = document.createElement('li');                  // Visa namn, tid och antal gissningar för varje runda
+                    listItem.textContent = `${entry.name} - Time: ${entry.time} - Guesses: ${entry.guesses}`; // Lägg till listelementet till leaderboarden
+                    leaderboardList.appendChild(listItem);  // Lägger till det nya listelementet i leaderboarden
+                });
+            }
+
+            // funktion som genererar ett nummer mellan min, max 
+            function getRandomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;   // Returnerar ett slumpmässigt heltal mellan min och max
+            }
+
+            // Spellogiken
+            let targetNumber; // Det slumpmässiga numret som spelaren ska gissa
+            let startTime; // Starttid för spelet
+            let endTime; // Sluttid för spelet
+            let elapsedTime; // Total tid för spelet
+            let numGuesses = 0; // Antal gissningar
+            let playerName; // Spelarens namn
+
+            function startGame() {    // Funktion för att starta spelet
+                targetNumber = getRandomNumber(1, 100);         // Generera ett slumpmässigt nummer mellan 1 och 100
+                startTime = Date.now();         // Spara starttiden för spelet
+            }
+
+            function endGame() { // funktion för att avsluta spelet
+                endTime = Date.now();           // Spara sluttiden för spelet
+                elapsedTime = (endTime - startTime) / 1000;         // Beräkna totaltid för spelet i sekunder
+                resultDisplay.textContent = `Grattis! Du gissade numret ${targetNumber} på ${numGuesses} gissningar och ${elapsedTime} sekunder.`;
+                     // Visa resultatet för spelaren inklusive det slumpmässiga numret, antal gissningar och tid
+                playerName = prompt('Grattis! Du gissade numret. Skriv ditt namn för leaderboarden:');              
+                 // Frågar spelaren efter deras namn för att kunna spara det till leaderboarden
+            }
+
+             // Lägg till event listener för att skicka gissning när knappen klickas
+            submitGuessButton.addEventListener('click', function() {
+                const guess = parseInt(guessInput.value);           // Hämta gissningen från inputfältet och konvertera till ett heltal
+                if (isNaN(guess) || guess < 1 || guess > 100) {        // Kontrollera om gissningen är ett giltigt nummer mellan 1 och 100
+                    resultDisplay.textContent = 'Vänligen ange ett giltigt nummer mellan 1 och 100.';   
+                    return;
+                }
+                numGuesses++;        // Öka antalet gissningar
+                if (guess === targetNumber) {           // Jämför gissningen med det slumpmässiga numret
+                    endGame();              // Om gissningen är korrekt, avsluta spelet
+                } else if (guess < targetNumber) {
+                    resultDisplay.textContent = 'För lågt! Testa ett högre nummer.';            // Om gissningen är för låg, visa meddelande
+                } else {
+                    resultDisplay.textContent = 'För högt! Testa ett mindre nummer.';            // Om gissningen är för hög, visa meddelande
+
+                }
+            });
+            startGame();    // Starta spelet när sidan laddas
+        });
+    </script>
+</body>
+</html>
